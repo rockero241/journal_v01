@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/journal.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Daily Reflections Logo" class="logo-img">
+        </div>
+        <div class="nav-left">
+            <a href="{{ url_for('main.index') }}">Home</a>
+            <a href="{{ url_for('auth.login') }}">Login</a>
+            <a href="{{ url_for('auth.register') }}">Register</a>
+        </div>
+    <div class="nav-right">
+        <form action="{{ url_for('auth.login') }}" method="POST" class="nav-form">
+            <input type="text" name="username" placeholder="Username" class="nav-input">
+            <input type="password" name="password" placeholder="Password" class="nav-input">
+            <button type="submit" class="nav-login-btn">Login</button>
+            <a href="{{ url_for('auth.register') }}" class="nav-register-btn">Register</a>
+        </form>
+    </div>
+
+    </nav>
+
+    <style>
+    .nav-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: #333;
+        color: white;
+    }
+
+    .nav-logo {
+        margin-right: 20px;
+    }
+
+    .logo-img {
+        height: 60px;
+        width: auto;
+    }
+
+    .nav-login-btn {
+        background-color: #2196F3; 
+        color: white;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+	text-decoration: none;
+        margin-left: 10px;
+    }
+
+    .nav-login-btn:hover {
+        background-color: #1976D2;
+    }
+
+    .nav-register-btn {
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        margin-left: 10px;
+    }
+
+    .nav-register-btn:hover {
+        background-color: #1976D2;
+    }  
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        margin-right: auto;
+    }
+
+    .nav-left a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px;
+        padding: 5px 10px;
+    }
+
+    .nav-left a:hover {
+        background-color: #444;
+        border-radius: 4px;
+    }
+
+    .nav-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .nav-input {
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 120px;
+    }
+    </style>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+

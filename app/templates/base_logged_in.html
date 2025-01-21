@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/journal.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Daily Reflections Logo" class="logo-img">
+        </div>
+        <div class="nav-left">
+            <a href="{{ url_for('main.index') }}">Home</a>
+            <a href="{{ url_for('journal.create_entry') }}">New Entry</a>
+            <a href="{{ url_for('journal.view_entries') }}">View Entries</a>
+            <a href="{{ url_for('auth.logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <style>
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: #333;
+        color: white;
+    }
+
+    .nav-logo {
+        margin-right: 20px;
+    }
+
+    .logo-img {
+        height: 60px;
+        width: auto;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        margin-right: auto;
+    }
+
+    .nav-left a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px;
+        padding: 5px 10px;
+    }
+
+    .nav-left a:hover {
+        background-color: #444;
+        border-radius: 4px;
+    }
+    </style>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+

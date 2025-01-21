@@ -1,0 +1,46 @@
+{% extends "base_logged_in.html" %}
+
+{% block title %}Journaling App{% endblock %}
+
+{% block content %}
+<div class="journal-form">
+    <h2>Journaling App</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="mood">Mood (e.g., great, good, meh, bad):</label>
+            <input type="text" id="mood" name="mood" required>
+        </div>
+
+        <div class="form-group">
+            <label for="gratitude">What are you grateful for today?</label>
+            <input type="text" id="gratitude" name="gratitude" required>
+        </div>
+
+        <div class="form-group">
+            <label for="room_for_growth">What could have gone better today?</label>
+            <input type="text" id="room_for_growth" name="room_for_growth" required>
+        </div>
+
+        <div class="form-group">
+            <label for="thoughts">What's on your mind?</label>
+            <textarea id="thoughts" name="thoughts" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Do you want AI feedback?</label>
+            <div class="radio-group">
+                <label class="radio-label">
+                    <input type="radio" name="feedback" value="yes">
+                    Yes
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="feedback" value="no" checked>
+                    No
+                </label>
+            </div>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{% endblock %}
