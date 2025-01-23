@@ -26,8 +26,11 @@ Welcome to **AI Journal**, an innovative and reflective journaling application! 
 ## ✅ TODO
 
 - [x] **Implement SQLite** to store journal entries.
-- [ ] Enhance interactivity for users to revisit and explore past journal entries.
+- [x] Enhance interactivity for users to revisit and explore past journal entries.
 - [ ] Expand AI features for smarter feedback and analysis.
+- [ ] Improve User Interface and website visuals.
+- [ ] Host live website on AWS / Azure.
+- [ ] Improve user credentials system.
 
 ---
 
