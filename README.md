@@ -31,6 +31,7 @@ Welcome to **AI Journal**, an innovative and reflective journaling application! 
 - [ ] Improve User Interface and website visuals.
 - [ ] Host live website on AWS / Azure.
 - [ ] Improve user credentials system (forgot password, etc)
+- [ ] Enhance security
 
 ---
 
