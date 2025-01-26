@@ -1,0 +1,12 @@
+{% extends "base_logged_in.html" %}
+
+{% block title %}Email Confirmation Required{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h2>Email Confirmation Required</h2>
+    <p>Please confirm your email before logging in.</p>
+    <p>Haven't received the confirmation email? <a href="{{ url_for('auth.resend_confirmation') }}">Click here to request a new one</a></p>
+    <p><a href="{{ url_for('auth.login') }}">Back to Login</a></p>
+</div>
+{% endblock %}

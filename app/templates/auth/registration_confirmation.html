@@ -1,0 +1,15 @@
+{% extends "base_logged_in.html" %}
+
+{% block title %}Registration Confirmation{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h2>Registration Successful!</h2>
+    <div class="confirmation-message">
+        <p>Thank you for registering! We've sent a confirmation email to your inbox.</p>
+        <p>Please check your email (including spam folder) and click the activation link to complete your registration.</p>
+        <p>Once you've confirmed your email, you can <a href="{{ url_for('auth.login') }}">login here</a>.</p>
+    </div>
+</div>
+{% endblock %}
+

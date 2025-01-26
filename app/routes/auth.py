@@ -1,8 +1,13 @@
+import secrets
+import smtplib
+import os
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User
 from app import db
 from app.routes import journal
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 bp = Blueprint('auth', __name__)
 
@@ -15,54 +20,174 @@ def login():
         user = User.query.filter_by(username=username).first()
         
         if user and user.check_password(password):
+            if not user.is_confirmed:
+                flash('Please confirm your email before logging in.')
+                return render_template('auth/unconfirmed.html')
+            
             login_user(user)
-            flash('Logged in successfully!')
-            #next_page = request.args.get('next')
-            #return redirect(next_page) if next_page else redirect(url_for('main.index'))
-            #return redirect(next_page) if next_page else redirect(url_for('journal.form'))
+            if user.is_temporary_password:
+                return redirect(url_for('auth.change_password'))
             return redirect(url_for('journal.create_entry'))
         else:
             flash('Invalid username or password')
-            #return redirect(url_for('auth.login'))
             
     return render_template('auth/login.html')
-    #return redirect(url_to('main.form'))
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
+    print(f"Debug1: method: {request.method}")
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-
+        
+        print(f"Debug2: Received data - username: {username}, email: {email}")
+        
         if password != confirm_password:
             flash('Passwords do not match!')
             return redirect(url_for('auth.register'))
-
+            
+        print(f"Debug3: Checking existing username")
         user_exists = User.query.filter_by(username=username).first()
-        email_exists = User.query.filter_by(email=email).first()
-
+        print(f"Debug4: User exists check result: {user_exists}")
+        
         if user_exists:
             flash('Username already exists!')
             return redirect(url_for('auth.register'))
+        
+        print(f"Debug5: Checking existing email")
+        email_exists = User.query.filter_by(email=email).first()
+        print(f"Debug6: Email exists check result: {email_exists}")
         
         if email_exists:
             flash('Email already registered!')
             return redirect(url_for('auth.register'))
 
+        print(f"Debug7: Creating new user")
         new_user = User()
         new_user.username = username
         new_user.email = email
         new_user.set_password(password)
-
+        token = new_user.generate_confirmation_token()
+        
+        print(f"Debug8: Adding user to database")
         db.session.add(new_user)
         db.session.commit()
+        print(f"Debug9: After comitting the new user to the database: {new_user}")
 
-        flash('Registration successful!')
-        return redirect(url_for('auth.login'))
+        # Send confirmation email
+        confirmation_link = url_for('auth.confirm_email', token=token, _external=True)
+        msg = MIMEMultipart()
+        msg['From'] = os.environ.get("MY_GOOGLE_USER")
+        msg['To'] = email
+        msg['Subject'] = "Journal App - Please confirm Your Email"
+        
+        body = (f"Dear {username.capitalize()},\n\n"
+        f"Thank you for registering with our Journal App.\n\n"
+        f"Please click the following link to confirm your email: {confirmation_link}\n\n"
+        f"Best regards,\n"
+        f"Journal App Team")
+        msg.attach(MIMEText(body, 'plain'))
 
+        # Send email using existing SMTP configuration
+        smtp_server = "smtp.gmail.com"
+        port = 587
+        sender_email = os.environ.get("MY_GOOGLE_USER")
+        app_password = os.environ.get("MY_GOOGLE_PASS")
+
+        print(f"Debug10: Before sending mail: {smtp_server}, {port}, {sender_email}, {app_password}")
+        try:
+            server = smtplib.SMTP(smtp_server, port)
+            server.starttls()
+            server.login(sender_email, app_password)
+            server.send_message(msg)
+            server.quit()
+            # Replace the redirect with rendering the confirmation page
+            return render_template('auth/registration_confirmation.html')
+        except Exception as e:
+            flash('Error sending confirmation email.')
+            print(f"Debug: Error sending confirmation email: {e}")
+        
     return render_template('auth/register.html')
+
+@bp.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        if not email:
+            flash('Email is required!')
+            return render_template('auth/reset_password.html')
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            new_password = secrets.token_urlsafe(12)
+            user.set_password(new_password)
+            user.is_temporary_password = True
+            
+            
+            # Gmail SMTP configuration
+              #  Get variables from environment
+            google_user=os.environ.get("MY_GOOGLE_USER")
+            google_pass=os.environ.get("MY_GOOGLE_PASS")
+         
+            smtp_server = "smtp.gmail.com"
+            port = 587
+            sender_email = google_user
+            app_password = google_pass
+
+            #  Please set up a 16 digits password in this link
+            #  https://support.google.com/mail/?p=InvalidSecondFactor
+            #  Then click on Create and manage your app passwords
+
+
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = email
+            msg['Subject'] = "Password Reset"
+
+            body = f"Your new password is: {new_password}\nPlease change it after logging in."
+            msg.attach(MIMEText(body, 'plain'))
+            print(f"Debug: Before try ")
+
+            try:
+                server = smtplib.SMTP(smtp_server, port)
+                server.starttls()
+                server.login(sender_email, app_password)
+                server.send_message(msg)
+                server.quit()
+
+                db.session.commit()
+                flash('New password has been sent to your email!')
+                return redirect(url_for('auth.login'))
+            except Exception as e:
+                print(f"Debug:  Exception: {e}")
+                flash('Error sending email. Please try again.')
+                return redirect(url_for('auth.reset_password'))
+        else:
+            flash('Email not found!')
+
+    return render_template('auth/reset_password.html')
+
+@bp.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if new_password != confirm_password:
+            flash('Passwords do not match!')
+            return render_template('auth/change_password.html')
+        
+        current_user.set_password(new_password)
+        current_user.is_temporary_password = False
+        db.session.commit()
+        
+        flash('Password successfully updated!')
+        return redirect(url_for('journal.create_entry'))
+    
+    return render_template('auth/change_password.html')
 
 @bp.route('/logout')
 @login_required
@@ -75,3 +200,67 @@ def logout():
 def index():
     #return render_template('auth/form.html')
     return redirect(url_for('auth.home'))
+
+@bp.route('/confirm/<token>')
+def confirm_email(token):
+    try:
+        user = User.query.filter_by(confirmation_token=token).first()
+        if user:
+            if user.is_confirmed:
+                print(f"Debug1: User {user.username} is already confirmed.")
+                flash('Account already confirmed.')
+            else:
+                user.is_confirmed = True
+                user.confirmation_token = None
+                db.session.commit()
+                flash('Your account has been confirmed! You can now login.')
+                print(f"Debug2: User {user.username} confirmed.")
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Invalid or expired confirmation link.')
+            print(f"Debug3:  User not found for token: {token}")
+            return redirect(url_for('auth.login'))
+    except:
+        flash('The confirmation link is invalid or has expired.')
+        print(f"Debug4:  Error confirming email for token: {token}")
+        return redirect(url_for('auth.login'))  
+      
+@bp.route('/resend_confirmation', methods=['GET', 'POST'])
+def resend_confirmation():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user and not user.is_confirmed:
+            token = user.generate_confirmation_token()
+            confirmation_link = url_for('auth.confirm_email', token=token, _external=True)
+            
+            msg = MIMEMultipart()
+            msg['From'] = os.environ.get("MY_GOOGLE_USER")
+            msg['To'] = email
+            msg['Subject'] = "Journal App - New Confirmation Email"
+            
+            body = (f"Dear {user.username.capitalize()},\n\n"                   f"Here is your new confirmation link: {confirmation_link}\n\n"
+                   f"Best regards,\n"
+                   f"Journal App Team")
+            msg.attach(MIMEText(body, 'plain'))
+
+            smtp_server = "smtp.gmail.com"
+            port = 587
+            sender_email = os.environ.get("MY_GOOGLE_USER")
+            app_password = os.environ.get("MY_GOOGLE_PASS")
+
+            try:
+                server = smtplib.SMTP(smtp_server, port)
+                server.starttls()
+                server.login(sender_email, app_password)
+                server.send_message(msg)
+                server.quit()
+                return render_template('auth/resend_confirmation_success.html')
+            except Exception as e:
+                flash('Error sending confirmation email.')
+                print(f"Debug: Error sending confirmation email: {e}")
+        else:
+            flash('Email not found or already confirmed.')
+            
+    return render_template('auth/resend_confirmation.html')

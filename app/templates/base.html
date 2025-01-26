@@ -9,26 +9,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/journal.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-logo">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Daily Reflections Logo" class="logo-img">
-        </div>
-        <div class="nav-left">
-            <a href="{{ url_for('main.index') }}">Home</a>
-            <a href="{{ url_for('auth.login') }}">Login</a>
-            <a href="{{ url_for('auth.register') }}">Register</a>
-        </div>
-    <div class="nav-right">
-        <form action="{{ url_for('auth.login') }}" method="POST" class="nav-form">
-            <input type="text" name="username" placeholder="Username" class="nav-input">
-            <input type="password" name="password" placeholder="Password" class="nav-input">
-            <button type="submit" class="nav-login-btn">Login</button>
-            <a href="{{ url_for('auth.register') }}" class="nav-register-btn">Register</a>
-        </form>
-    </div>
-
-    </nav>
-
+    {% if current_user.is_authenticated %}
+        <nav class="navbar">
+            <div class="nav-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Daily Reflections Logo" class="logo-img">
+            </div>
+            <div class="nav-left">
+                <a href="{{ url_for('main.index') }}">Home</a>
+                <a href="{{ url_for('journal.create_entry') }}">New Entry</a>
+                <a href="{{ url_for('journal.view_entries') }}">View Entries</a>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            </div>
+        </nav>
+    {% else %}
+        <nav class="navbar">
+            <div class="nav-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Daily Reflections Logo" class="logo-img">
+            </div>
+            <div class="nav-left">
+                <a href="{{ url_for('main.index') }}">Home</a>
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.register') }}">Register</a>
+            </div>
+            <div class="nav-right">
+                <form action="{{ url_for('auth.login') }}" method="POST" class="nav-form">
+                    <input type="text" name="username" placeholder="Username" class="nav-input">
+                    <input type="password" name="password" placeholder="Password" class="nav-input">
+                    <button type="submit" class="nav-login-btn">Login</button>
+                    <a href="{{ url_for('auth.register') }}" class="nav-register-btn">Register</a>
+                </form>
+            </div>
+        </nav>
+    {% endif %}
     <style>
     .nav-form {
         display: flex;
