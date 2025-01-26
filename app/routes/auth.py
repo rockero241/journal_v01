@@ -1,7 +1,7 @@
 import secrets
 import smtplib
 import os
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User
 from app import db
@@ -40,12 +40,12 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+        first_name = request.form.get('first_name')  # Get first_name from form
         
         if password != confirm_password:
             flash('Passwords do not match!')
             return redirect(url_for('auth.register'))
             
-        print(f"Debug3: Checking existing username")
         user_exists = User.query.filter_by(username=username).first()        
         
         if user_exists:
@@ -59,14 +59,29 @@ def register():
             return redirect(url_for('auth.register'))
         
         new_user = User()
+        # Basic auth fields
         new_user.username = username
         new_user.email = email
         new_user.set_password(password)
+        
+        # Personal information
+        new_user.first_name = request.form.get('first_name')
+        new_user.last_name = request.form.get('last_name')
+        new_user.phone = request.form.get('phone')
+        
+        # Address information
+        new_user.address = request.form.get('address')
+        new_user.city = request.form.get('city')
+        new_user.state = request.form.get('state')
+        new_user.country = request.form.get('country')
+        new_user.postal_code = request.form.get('postal_code')
+        
+        # Generate confirmation token
         token = new_user.generate_confirmation_token()
         
+        # Save to database
         db.session.add(new_user)
-        db.session.commit()
-        
+        db.session.commit()        
         # Send confirmation email
         confirmation_link = url_for('auth.confirm_email', token=token, _external=True)
         msg = MIMEMultipart()
@@ -74,11 +89,11 @@ def register():
         msg['To'] = email
         msg['Subject'] = "Journal App - Please confirm Your Email"
         
-        body = (f"Dear {username.capitalize()},\n\n"
+        body = (f"Dear {first_name.capitalize()},\n\n"
         f"Thank you for registering with our Journal App.\n\n"
         f"Please click the following link to confirm your email: {confirmation_link}\n\n"
         f"Best regards,\n"
-        f"Journal App Team")
+        f"Journal App Team")        
         msg.attach(MIMEText(body, 'plain'))
 
         # Send email using existing SMTP configuration
@@ -226,9 +241,9 @@ def resend_confirmation():
             msg['To'] = email
             msg['Subject'] = "Journal App - New Confirmation Email"
             
-            body = (f"Dear {user.username.capitalize()},\n\n"                   f"Here is your new confirmation link: {confirmation_link}\n\n"
+            body = (f"Dear {user.first_name.capitalize()},\n\n"                   f"Here is your new confirmation link: {confirmation_link}\n\n"
                    f"Best regards,\n"
-                   f"Journal App Team")
+                   f"Journal App Team")            
             msg.attach(MIMEText(body, 'plain'))
 
             smtp_server = "smtp.gmail.com"
@@ -250,3 +265,13 @@ def resend_confirmation():
             flash('Email not found or already confirmed.')
             
     return render_template('auth/resend_confirmation.html')
+
+@bp.route('/check_username/<username>')
+def check_username(username):
+    user = User.query.filter_by(username=username).first()
+    return jsonify({'available': user is None})
+
+@bp.route('/check_email/<email>')
+def check_email(email):
+    user = User.query.filter_by(email=email).first()
+    return jsonify({'available': user is None})
