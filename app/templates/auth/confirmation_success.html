@@ -5,13 +5,13 @@
 {% block content %}
 <div class="auth-form">
     <h2>Email Confirmed Successfully!</h2>
-    <p>Your email has been confirmed. You will be redirected to the login page in 3 seconds...</p>
+    <p>Your email has been confirmed. You will be redirected to the login page in 5 seconds...</p>
 </div>
 
 <script>
     setTimeout(function() {
         window.location.href = "{{ url_for('auth.login') }}";
-    }, 3000);
+    }, 5000);
 </script>
 {% endblock %}
 

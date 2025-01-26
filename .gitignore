@@ -15,3 +15,4 @@ app.db.bk
 app/static/css/auth.css.bk
 app/templates/base.html.bk
 migrations/versions/8287881aeed2_initial_migration.py
+migrations/versions/

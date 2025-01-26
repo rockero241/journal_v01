@@ -34,48 +34,39 @@ def login():
     return render_template('auth/login.html')
 
 @bp.route('/register', methods=['GET', 'POST'])
-def register():
-    print(f"Debug1: method: {request.method}")
+def register():    
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         
-        print(f"Debug2: Received data - username: {username}, email: {email}")
-        
         if password != confirm_password:
             flash('Passwords do not match!')
             return redirect(url_for('auth.register'))
             
         print(f"Debug3: Checking existing username")
-        user_exists = User.query.filter_by(username=username).first()
-        print(f"Debug4: User exists check result: {user_exists}")
+        user_exists = User.query.filter_by(username=username).first()        
         
         if user_exists:
             flash('Username already exists!')
-            return redirect(url_for('auth.register'))
+            return redirect(url_for('auth.register'))        
         
-        print(f"Debug5: Checking existing email")
-        email_exists = User.query.filter_by(email=email).first()
-        print(f"Debug6: Email exists check result: {email_exists}")
+        email_exists = User.query.filter_by(email=email).first()        
         
         if email_exists:
             flash('Email already registered!')
             return redirect(url_for('auth.register'))
-
-        print(f"Debug7: Creating new user")
+        
         new_user = User()
         new_user.username = username
         new_user.email = email
         new_user.set_password(password)
         token = new_user.generate_confirmation_token()
         
-        print(f"Debug8: Adding user to database")
         db.session.add(new_user)
         db.session.commit()
-        print(f"Debug9: After comitting the new user to the database: {new_user}")
-
+        
         # Send confirmation email
         confirmation_link = url_for('auth.confirm_email', token=token, _external=True)
         msg = MIMEMultipart()
@@ -96,7 +87,7 @@ def register():
         sender_email = os.environ.get("MY_GOOGLE_USER")
         app_password = os.environ.get("MY_GOOGLE_PASS")
 
-        print(f"Debug10: Before sending mail: {smtp_server}, {port}, {sender_email}, {app_password}")
+        print(f"Debug10: Before sending mail: {smtp_server}, {port}, {sender_email}")
         try:
             server = smtplib.SMTP(smtp_server, port)
             server.starttls()
@@ -207,24 +198,19 @@ def confirm_email(token):
         user = User.query.filter_by(confirmation_token=token).first()
         if user:
             if user.is_confirmed:
-                print(f"Debug1: User {user.username} is already confirmed.")
                 flash('Account already confirmed.')
             else:
                 user.is_confirmed = True
                 user.confirmation_token = None
                 db.session.commit()
-                flash('Your account has been confirmed! You can now login.')
-                print(f"Debug2: User {user.username} confirmed.")
-            return redirect(url_for('auth.login'))
+                return render_template('auth/confirmation_success.html')
         else:
             flash('Invalid or expired confirmation link.')
-            print(f"Debug3:  User not found for token: {token}")
             return redirect(url_for('auth.login'))
     except:
         flash('The confirmation link is invalid or has expired.')
-        print(f"Debug4:  Error confirming email for token: {token}")
-        return redirect(url_for('auth.login'))  
-      
+        return redirect(url_for('auth.login'))
+          
 @bp.route('/resend_confirmation', methods=['GET', 'POST'])
 def resend_confirmation():
     if request.method == 'POST':
