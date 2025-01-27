@@ -35,4 +35,8 @@ Welcome to **AI Journal**, an innovative and reflective journaling application! 
 
 ---
 
+## Product backlog: https://docs.google.com/document/d/1JmegCpwv1piTIYuYMksAryF_9wDANDffInvd1ELM6eA/edit?usp=sharing
+
+---
+
 ✨ Stay tuned for more updates as we build an empowering and innovative journaling experience! ✨
