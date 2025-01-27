@@ -36,3 +36,4 @@ Welcome to **AI Journal**, an innovative and reflective journaling application! 
 ---
 
 ✨ Stay tuned for more updates as we build an empowering and innovative journaling experience! ✨
+ 
