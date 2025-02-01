@@ -1,0 +1,14 @@
+<div class="entries-container">
+    {% for entry in entries %}
+    <div class="entry-card" data-entry-id="{{ entry.id }}">
+        <div class="entry-header">
+            <span class="entry-date">{{ entry.date.strftime('%B %d, %Y') }}</span>
+            <span class="mood-badge mood-{{ entry.mood.lower() }}">{{ entry.mood }}</span>
+        </div>
+        <div class="entry-preview">
+            {{ entry.content[:100] + '...' if entry.content|length > 100 else entry.content }}
+        </div>
+        <button class="view-entry-btn">View Full Entry</button>
+    </div>
+    {% endfor %}
+</div>
