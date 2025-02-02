@@ -23,3 +23,8 @@ migrations/versions/__pycache__/
 # Ignore system-specific files
 .DS_Store
 Thumbs.db
+
+# ignore new files
+app/static/css/journal_form.css
+templates/journal/journal_form.html
+
