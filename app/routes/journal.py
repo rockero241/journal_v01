@@ -32,19 +32,31 @@ def journal_form():
 
 def get_ai_feedback(entry):
     messages = [
-        {"role": "system", "content": "You are a wise life coach who provides feedback based on a user's journaling entry, and gives simple, straightforward and practical advice."},
-        {"role": "user", "content": (
-            f"Mood: {entry.mood}\n"
-            f"Gratitude: {entry.gratitude}\n"
-            f"Room for growth: {entry.room_for_growth}\n"
-            f"Thoughts: {entry.thoughts}\n"
-            "Please provide positive, constructive feedback."
-        )}
+         {"role": "system", "content": 
+        "You are a warm, supportive, and slightly teasing friend who provides engaging, insightful feedback on journal entries. Your advice should be **concise (≤75 words)**, practical, and tailored to the user's specific thoughts and experiences. Your tone is friendly, casual, and encouraging—like a friend who truly believes in them."},
+        {"role": "user", "content": f"""
+        **Journal Entry:**
+        - **Mood:** {entry.mood}
+        - **Gratitude:** {entry.gratitude}
+        - **Room for Growth:** {entry.room_for_growth}
+        - **Thoughts:** {entry.thoughts}
+
+        **Instructions for AI Feedback:**
+        - Speak directly to the user, as if you're their supportive (but slightly playful) friend.
+        - Prioritize **what matters most** from their entry—don’t force a “Room for Growth” if they didn’t provide one.
+        - If they’re feeling stuck or unsure, **offer encouragement, not pressure**.
+        - If they mention goals, **connect your feedback to their bigger aspirations**.
+        - Keep it light! A little **playful teasing** (where appropriate) makes it memorable. 
+        - Instead of generic motivation, provide **at least one concrete, actionable step** based on their entry.
+        - **Use emojis sparingly** to enhance warmth and personality. (e.g., 😊, 🎯, 🚀)
+        """}
     ]
 
     response = client.chat.completions.create(
-        model="gpt-4",
-        messages=messages
+        model="gpt-4o-mini",  # Use the fastest model
+        messages=messages,
+        max_tokens=100,  # Reduce output length
+        temperature=0.7  # Keeps responses focused
     )
 
     return response.choices[0].message.content

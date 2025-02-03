@@ -51,6 +51,10 @@
                     <span class="entry-date">{{ entry.entry_date.strftime('%Y-%m-%d %H:%M') }}</span>
                     <span class="entry-mood">{{ entry.mood }}</span>
                 </div>
+                <div class="entry-preview">
+                    <p class="preview-gratitude">"{{ entry.gratitude[:100] }}{% if entry.gratitude|length > 100 %}...{% endif %}"</p>
+                    <p class="preview-thoughts">"{{ entry.thoughts[:100] }}{% if entry.thoughts|length > 100 %}...{% endif %}"</p>
+                </div>
                 <div class="preview-indicator">Click to view full entry →</div>
             </div>
             {% endfor %}
