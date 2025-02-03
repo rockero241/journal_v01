@@ -110,3 +110,18 @@ def view_entry(entry_id):
     if entry.user_id != current_user.id:
         abort(403)
     return render_template('journal/entry_detail.html', entry=entry)
+
+# delete entry
+@bp.route('/journal/delete/<int:entry_id>', methods=['POST'])
+@login_required
+def delete_entry(entry_id):
+    entry = Entry.query.get_or_404(entry_id)
+    
+    if entry.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+        
+    db.session.delete(entry)
+    db.session.commit()
+    
+    flash("Journal entry deleted successfully!", "success")
+    return redirect(url_for('journal.view_entries'))

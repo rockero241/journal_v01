@@ -9,62 +9,33 @@ bp = Blueprint('auth', __name__)
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username').lower()  # Convert to lowercase
-        password = request.form.get('password')
-        
-        user = User.query.filter_by(username=username).first()
-        
-        if user and user.check_password(password):
-            login_user(user)
-            if user.is_temporary_password:
-                return redirect(url_for('auth.change_password'))
-            return redirect(url_for('journal.create_entry'))
-        else:
-            flash('Invalid username or password')
-            
-    return render_template('auth/login.html')
-
-@bp.route('/register', methods=['GET', 'POST'])
-def register():    
-    if request.method == 'POST':
-        username = request.form.get('username').lower()  # Convert to lowercase
         email = request.form.get('email')
         password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        first_name = request.form.get('first_name')        
-        if password != confirm_password:
-            flash('Passwords do not match!')
-            return redirect(url_for('auth.register'))
-            
-        user_exists = User.query.filter_by(username=username).first()        
-        if user_exists:
-            flash('Username already exists!')
-            return redirect(url_for('auth.register'))        
+        user = User.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+            return redirect(url_for('main.dashboard'))
+
+        flash("Invalid email or password", "error")
+    return render_template('auth/login.html')  # Updated path
+
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
         
-        email_exists = User.query.filter_by(email=email).first()        
-        if email_exists:
-            flash('Email already registered!')
-            return redirect(url_for('auth.register'))
-        
-        new_user = User()
-        new_user.username = username
-        new_user.email = email
-        new_user.set_password(password)
-        new_user.first_name = first_name
-        new_user.last_name = request.form.get('last_name')
-        new_user.phone = request.form.get('phone')
-        new_user.address = request.form.get('address')
-        new_user.city = request.form.get('city')
-        new_user.is_confirmed = True
-        
-        db.session.add(new_user)
+        user = User(username=username, email=email)
+        user.set_password(password)
+        db.session.add(user)
         db.session.commit()
         
-        login_user(new_user)
-        return redirect(url_for('journal.create_entry'))
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('auth.login'))
         
     return render_template('auth/register.html')
-
 @bp.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
     if request.method == 'POST':
