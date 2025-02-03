@@ -9,17 +9,16 @@ bp = Blueprint('auth', __name__)
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
+        username = request.form.get('username')  # Changed from email to username
         password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(username=username).first()  # Changed to search by username
 
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('journal.create_entry'))
 
-        flash("Invalid email or password", "error")
-    return render_template('auth/login.html')  # Updated path
-
+        flash("Invalid username or password", "error")
+    return render_template('auth/login.html')
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -96,3 +95,4 @@ def check_username(username):
 def check_email(email):
     user = User.query.filter_by(email=email).first()
     return jsonify({'available': user is None})
+
