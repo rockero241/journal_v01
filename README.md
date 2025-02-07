@@ -40,12 +40,11 @@ Welcome to **AI Journal**, a **modern, AI-powered journaling application** desig
 
 ## ✅ Current Progress & To-Do List  
 ✔️ **Optimized AI feedback for faster, richer insights.**  
-✔️ **Improved UI/UX for journal entry display.**  
-✔️ **Deployed a working prototype.**  
+✔️ **Improved UI/UX for journal entry display.**    
 ✔️ **Refined AI tone & personality.**  
+✔️ **Enhance user authentication & security.**
 🔲 **Host on Render/AWS/Azure for public access.**  
-🔲 **Expand AI memory for long-term journaling insights.**  
-✔️ **Enhance user authentication & security.**  
+🔲 **Expand AI memory for long-term journaling insights.**    
 🔲 **Improve mobile UI/UX.**  
 🔲 **Deployed a working prototype.**
 
