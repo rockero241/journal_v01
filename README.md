@@ -50,7 +50,7 @@ Welcome to **AI Journal**, a **modern, AI-powered journaling application** desig
 
 ---
 
-✨ **AI Journal is almost ready for launch!** Stay tuned for updates, and get ready for **a whole new way to journal!** 🚀  
+✨ **AI Journal is almost ready for launch!** Stay tuned for updates, and get ready for a whole new way to journal! 🚀  
 
 ---
 
