@@ -43,6 +43,7 @@ Welcome to **AI Journal**, a **modern, AI-powered journaling application** desig
 ✔️ **Improved UI/UX for journal entry display.**    
 ✔️ **Refined AI tone & personality.**  
 ✔️ **Enhance user authentication & security.**
+🔲 Convert Web APP to React
 🔲 Restructure Database for ML
 🔲 **Host on Render/AWS/Azure for public access.**  
 🔲 **Expand AI memory for long-term journaling insights.**    
