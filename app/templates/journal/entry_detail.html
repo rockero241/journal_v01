@@ -16,6 +16,11 @@
     <div class="back-button">
         <a href="{{ url_for('journal.view_entries') }}">← Back to Entries</a>
     </div>
+    // Add the delete button here
+    <div class="entry-actions">
+        <button class="delete-entry-btn" data-entry-id="{{ entry.id }}">❌ Delete Entry</button>
+    </div>
+    
 </div>
 
 <style>
@@ -49,5 +54,6 @@
     background: #e0e0e0;
 }
 </style>
+<script src="{{ url_for('static', filename='js/entries.js') }}"></script>
 {% endblock %}
 

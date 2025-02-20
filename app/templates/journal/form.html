@@ -8,7 +8,13 @@
     <form method="post">
         <div class="form-group">
             <label for="mood">Mood (e.g., great, good, meh, bad):</label>
-            <input type="text" id="mood" name="mood" required>
+            <select class="form-select custom-dropdown" name="mood" required>
+                <option value="" disabled selected>How are you feeling today?</option>
+                <option value="great">Great</option>
+                <option value="good">Good</option>
+                <option value="meh">Meh</option>
+                <option value="bad">Bad</option>
+            </select>
         </div>
 
         <div class="form-group">
